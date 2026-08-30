@@ -1,6 +1,9 @@
 import "dotenv/config";
 import { db } from "./index";
-import { zaposleniTable } from "./schema";
+import {
+  zaposleniTable,
+} from "./schema";
+import { hashPassword } from "../lib/password";
 
 async function main() {
   const today = new Date().toISOString().slice(0, 10);
@@ -17,7 +20,7 @@ async function main() {
         datum_dolaska: today,
         datum_odlaska: null,
         username: "manager",
-        password: "manager123",
+        password: await hashPassword("manager123"),
         uloga: "MENADZER U HR-u",
       })
 
@@ -29,7 +32,7 @@ async function main() {
       datum_dolaska: today,
       datum_odlaska: null,
       username: "hr",
-      password: "hr123",
+      password: await hashPassword("hr123"),
       uloga: "ZAPOSLENI U HR-u",
       });
 
@@ -43,7 +46,7 @@ async function main() {
         datum_dolaska: today,
         datum_odlaska: null,
         username: "petar",
-        password: "petar123",
+        password: await hashPassword("petar123"),
         uloga: "ZAPOSLENI",
       })
     })
