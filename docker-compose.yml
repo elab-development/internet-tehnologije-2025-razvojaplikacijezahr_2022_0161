@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: hr
+    volumes:
+      - hr-db:/var/lib/postgresql/data
+    networks:
+      - hr-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d hr"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    image: hr-aplikacija:v1
+    container_name: hr-app
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/hr
+    command: npm run dev -- --hostname 0.0.0.0 --port 3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - hr-net
+
+volumes:
+  hr-db:
+    name: hr-db
+
+networks:
+  hr-net:
+    name: hr-net
