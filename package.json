@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:migrate": "drizzle-kit generate && drizzle-kit push",
+    "db:seed": "tsx db/seed.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",
