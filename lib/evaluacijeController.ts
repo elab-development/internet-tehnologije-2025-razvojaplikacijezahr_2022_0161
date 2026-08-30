@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
-import { db } from "@/db";
+import { db } from "../db";
 import { evaluacijaTable, zaposleniTable } from "@/db/schema";
-import { isHrEmployee, type SessionUser } from "@/lib/auth";
+import { isHrEmployee, type SessionUser } from "./auth";
 
 export async function listEvaluacije(
   session: SessionUser

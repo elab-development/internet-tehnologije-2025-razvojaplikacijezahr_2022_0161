@@ -1,8 +1,8 @@
 import { arrayContains, eq } from "drizzle-orm";
-import { db } from "@/db";
+import { db } from "../db";
 import { NextResponse } from "next/server";
 import { izvestajTable, zaposleniTable } from "@/db/schema";
-import { isHrManager, type SessionUser } from "@/lib/auth";
+import { isHrManager, type SessionUser } from "./auth";
 import next from "next";
 
 

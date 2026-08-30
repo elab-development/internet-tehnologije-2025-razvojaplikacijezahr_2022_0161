@@ -2,11 +2,11 @@ import { cookies } from "next/headers";
 import type { NextResponse } from "next/server";
 import type { SessionUserDto, Uloga } from "../shared/types";
 
-export const SESSION_COOKIE = "hr_session";
+const SESSION_COOKIE = "hr_session";
 
 export type SessionUser = SessionUserDto;
 
-export function cookieOpts(): {
+function cookieOpts(): {
   httpOnly: boolean;
   path: string;
   maxAge: number;
@@ -47,10 +47,6 @@ export function isHrEmployee(uloga: Uloga): boolean {
 
 export function isHrManager(uloga: Uloga): boolean {
   return uloga === "MENADZER U HR-u";
-}
-
-export function canApproveRequest(uloga: Uloga): boolean {
-  return isHrManager(uloga);
 }
 
 export function toSessionUser(row: {
