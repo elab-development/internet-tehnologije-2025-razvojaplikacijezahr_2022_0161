@@ -1,36 +1,134 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# HR aplikacija
 
-## Getting Started
+Veb aplikacija za upravljanje ljudskim resursima razvijena u okviru projekta iz predmeta Internet tehnologije.
 
-First, run the development server:
+Aplikacija omogućava upravljanje podacima o zaposlenima, podnošenje i obradu zahteva, podnošenje evaluacija i kreiranje izveštaja.
+
+## Korisničke uloge
+
+Sistem podržava tri korisničke uloge:
+
+- Zaposleni
+- Zaposleni u HR-u
+- Menadžer u HR-u
+
+Dostupne funkcionalnosti i pristup podacima zavise od uloge prijavljenog korisnika.
+
+## Funkcionalnosti
+
+Aplikacija omogućava:
+
+- prijavu i odjavu korisnika;
+- promenu lozinke;
+- kontrolu pristupa na osnovu korisničke uloge;
+- pregled i pretragu zaposlenih;
+- dodavanje i izmenu podataka o zaposlenima;
+- evidentiranje odlaska zaposlenog;
+- podnošenje i pregled zahteva;
+- obradu zahteva od strane HR zaposlenog;
+- odobravanje ili odbijanje zahteva od strane HR menadžera;
+- podnošenje i pregled evaluacija;
+- kreiranje i pregled izveštaja.
+
+## Korišćene tehnologije
+
+- Next.js
+- React
+- TypeScript
+- PostgreSQL
+- Drizzle ORM
+- Node.js
+- Docker
+- Docker Compose
+- Git i GitHub
+
+## Pokretanje aplikacije pomoću Docker-a
+
+Za pokretanje projekta potrebno je imati instalirane Docker i Docker Compose.
+
+Iz korenskog direktorijuma projekta pokrenuti:
+
+```bash
+docker compose up --build
+
+Ovom komandom se pokreću aplikacija i PostgreSQL baza podataka u odvojenim Docker kontejnerima.
+
+Nakon pokretanja kontejnera potrebno je izvršiti migraciju baze podataka:
+
+```bash
+docker compose exec app npm run db:migrate
+```
+
+Za inicijalno popunjavanje baze testnim podacima pokrenuti:
+
+```bash
+docker compose exec app npm run db:seed
+```
+
+Nakon uspešnog pokretanja aplikacija je dostupna na adresi:
+
+http://localhost:3000
+
+Za zaustavljanje Docker kontejnera koristiti:
+
+```bash
+docker compose down
+```
+
+## Lokalno pokretanje aplikacije
+
+Za lokalno pokretanje aplikacije potrebno je instalirati sve zavisnosti projekta:
+
+```bash
+npm install
+```
+
+Nakon instalacije zavisnosti aplikacija se pokreće komandom:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Za lokalno pokretanje potrebno je obezbediti dostupnu PostgreSQL bazu podataka i podesiti promenljivu okruženja `DATABASE_URL`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Aplikacija je nakon pokretanja dostupna na adresi:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+http://localhost:3000
 
-## Learn More
+## Struktura projekta
 
-To learn more about Next.js, take a look at the following resources:
+Najvažniji direktorijumi i fajlovi projekta su:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `src/app` – stranice aplikacije i API rute realizovane pomoću Next.js App Router-a
+- `src/components` – React komponente korisničkog interfejsa
+- `lib` – kontroleri, autentifikacija, autorizacija i poslovna logika aplikacije
+- `db` – konfiguracija baze podataka, definicija šeme i inicijalni podaci
+- `shared` – zajednički TypeScript tipovi koji se koriste u aplikaciji
+- `Dockerfile` – definicija Docker image-a aplikacije
+- `docker-compose.yml` – konfiguracija aplikacionog i PostgreSQL servisa
+- `drizzle.config.ts` – konfiguracija Drizzle ORM-a
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Baza podataka
 
-## Deploy on Vercel
+Za skladištenje podataka koristi se PostgreSQL baza podataka.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Struktura baze definisana je pomoću Drizzle ORM-a i obuhvata tabele za zaposlene, zahteve, evaluacije, izveštaje, obradu zahteva i odobravanje zahteva.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Migracije baze pokreću se komandom:
+
+```bash
+docker compose exec app npm run db:migrate
+```
+
+Inicijalni testni podaci mogu se dodati komandom:
+
+```bash
+docker compose exec app npm run db:seed
+```
+
+## Autori
+
+- Đorđe Živkov 2022/0131
+- Marija Stupar 2022/0161
+
+Projekat je realizovan u okviru predmeta Internet tehnologije.
