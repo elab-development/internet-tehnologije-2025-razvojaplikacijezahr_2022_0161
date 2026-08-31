@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { db } from "../db";
 import { zaposleniTable } from "@/db/schema";
@@ -8,6 +8,7 @@ import {
   toSessionUser,
   type SessionUser,
 } from "./auth";
+import { hashPassword, verifyPassword } from "./password";
 import type { Uloga } from "../shared/types";
 
 export async function loginUser(
@@ -23,24 +24,21 @@ export async function loginUser(
           prezime: zaposleniTable.prezime,
           uloga: zaposleniTable.uloga,
           username: zaposleniTable.username,
+          password: zaposleniTable.password,
         })
         .from(zaposleniTable)
-        .where(
-          and(
-            eq(zaposleniTable.username, username),
-            eq(zaposleniTable.password, password)
-          )
-        );
+        .where(eq(zaposleniTable.username, username));
     });
 
-    if (!data) {
+    const row = data[0];
+    if (!row || !(await verifyPassword(password, row.password))) {
       return NextResponse.json(
         { error: "Neispravno korisničko ime i lozinka." },
         { status: 401 }
       );
     }
-  
-    const user = toSessionUser(data[0]);
+
+    const user = toSessionUser(row);
     const response = NextResponse.json({
       message: "Ispravno korisničko ime i lozinka.",
       user,
@@ -49,7 +47,11 @@ export async function loginUser(
     return response;
   }
   catch (e) {
-    return NextResponse.json({error: e, status: 500});
+    console.error(e);
+    return NextResponse.json(
+      { error: "Greška prilikom prijave." },
+      { status: 500 }
+    );
   }
 }
 
@@ -84,12 +86,16 @@ export async function registerEmployee(
         datum_dolaska: data.datum_dolaska,
         datum_odlaska: data.datum_odlaska,
         username: data.username,
-        password: data.password,
+        password: await hashPassword(data.password),
         uloga: data.uloga,
       });
     });
   } catch (e)  {
-    return NextResponse.json({error: e, status: 500});
+    console.error(e);
+    return NextResponse.json(
+      { error: "Greška prilikom dodavanja zaposlenog." },
+      { status: 500 }
+    );
   }
 
   return NextResponse.json({ message: "Zaposleni je uspešno dodat." });
@@ -104,26 +110,26 @@ export async function changePassword(
   try {
     updated = await db.transaction(async (tx) => {
       const data = await tx
-        .select({ zaposleni_id: zaposleniTable.zaposleni_id })
+        .select({ password: zaposleniTable.password })
         .from(zaposleniTable)
-        .where(
-          and(
-            eq(zaposleniTable.zaposleni_id, session.zaposleni_id),
-            eq(zaposleniTable.password, oldPassword)
-          )
-        );
+        .where(eq(zaposleniTable.zaposleni_id, session.zaposleni_id));
 
-      if (!data) return false;
+      const row = data[0];
+      if (!row || !(await verifyPassword(oldPassword, row.password))) return false;
 
       await tx
         .update(zaposleniTable)
-        .set({ password: newPassword })
+        .set({ password: await hashPassword(newPassword) })
         .where(eq(zaposleniTable.zaposleni_id, session.zaposleni_id));
 
       return true;
     });
   } catch (e) {
-    return NextResponse.json({error: e, status: 500});
+    console.error(e);
+    return NextResponse.json(
+      { error: "Greška prilikom promene lozinke." },
+      { status: 500 }
+    );
   }
 
   if (!updated) {

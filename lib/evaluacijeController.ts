@@ -41,11 +41,15 @@ export async function listEvaluacije(
         .where(eq(evaluacijaTable.zaposleni_id, session.zaposleni_id));
     });
 
-    if (data) return NextResponse.json({ message: "Pronađene evaluacije.", data });
-    else return NextResponse.json({message: "Ne postoje evaluacije"})
+    if (data.length) return NextResponse.json({ message: "Pronađene evaluacije.", data });
+    else return NextResponse.json({ message: "Ne postoje evaluacije", data: [] })
   } catch (e) {
-    return NextResponse.json({error: e, status: 500});
-    }
+    console.error(e);
+    return NextResponse.json(
+      { error: "Greška prilikom učitavanja evaluacija." },
+      { status: 500 }
+    );
+  }
 }
 
 export async function createEvaluacija(
@@ -67,7 +71,10 @@ export async function createEvaluacija(
     )
     return NextResponse.json({ message: "Evaluacija je uspešno popunjena." });
   } catch (e) {
+    console.error(e);
     return NextResponse.json(
-      {error: e, status: 500});
-    }
+      { error: "Greška prilikom čuvanja evaluacije." },
+      { status: 500 }
+    );
+  }
 }

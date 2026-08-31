@@ -3,7 +3,6 @@ import { db } from "../db";
 import { NextResponse } from "next/server";
 import { izvestajTable, zaposleniTable } from "@/db/schema";
 import { isHrManager, type SessionUser } from "./auth";
-import next from "next";
 
 
 export async function listIzvestaji(session: SessionUser): Promise<NextResponse> {
@@ -26,11 +25,15 @@ export async function listIzvestaji(session: SessionUser): Promise<NextResponse>
         )
         .where(arrayContains(izvestajTable.pomenuti_zaposleni, [session.zaposleni_id]))
     })
-    if(data) return NextResponse.json({message: "Pronadjeni izveštaji", data})
-    else return NextResponse.json({message: "Ne postoje izveštaji"})
+    if (data.length) return NextResponse.json({message: "Pronadjeni izveštaji", data})
+    else return NextResponse.json({message: "Ne postoje izveštaji", data: []})
    }
   catch (e) {
-    return NextResponse.json({ error: e, status: 500 });
+    console.error(e);
+    return NextResponse.json(
+      { error: "Greška prilikom učitavanja izveštaja." },
+      { status: 500 }
+    );
   }
 }
 
@@ -39,7 +42,10 @@ export async function createIzvestaji(
   data: {sadrzaj: string, pomenuti_zaposleni: number[]}
 ): Promise<NextResponse> {
   if (!isHrManager(session.uloga)) {
-    return NextResponse.json({message:"Samo menadžer HR-a može generisati izveštaj.", status: 403 });
+    return NextResponse.json(
+      { error: "Samo menadžer HR-a može generisati izveštaj." },
+      { status: 403 }
+    );
   }
 
   const datum = new Date().toISOString().slice(0, 10);
@@ -56,6 +62,10 @@ export async function createIzvestaji(
     return NextResponse.json({message: "Izveštaj je uspešno kreiran"})
   }
   catch (e) {
-    return NextResponse.json({error: e, status: 500})
+    console.error(e);
+    return NextResponse.json(
+      { error: "Greška prilikom generisanja izveštaja." },
+      { status: 500 }
+    );
   }
 }
